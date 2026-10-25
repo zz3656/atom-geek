@@ -1,0 +1,210 @@
+/* Atom Blog — Post Extras: Reward & Navigation */
+
+.post-reward {
+  margin-top: 2.75rem;
+  padding: 1.5rem;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.reward-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 1.1rem;
+}
+
+.reward-qr {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.reward-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.reward-item img {
+  width: 140px;
+  height: 140px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-color);
+  transition: transform 0.2s;
+}
+
+.reward-item img:hover {
+  transform: scale(1.04);
+}
+
+.reward-item span {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  font-family: var(--font-mono);
+}
+
+/* ===== 上一篇 / 下一篇 ===== */
+.post-nav {
+  margin-top: 2.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+}
+
+.post-nav a {
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.45rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  color: var(--accent);
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.post-nav a:hover {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+}
+
+.post-nav-links {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  padding-top: 0.9rem;
+  text-align: center;
+}
+
+.post-nav-link {
+  display: block;
+  /* 网格项默认 min-width:auto，长标题会把 1fr 轨道撑破 → 允许收缩 */
+  min-width: 0;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  text-decoration: none;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  transition:
+    border-color 0.18s ease,
+    background-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.post-nav-link:hover {
+  border-color: var(--accent);
+  background: var(--bg-card-hover);
+  color: var(--accent);
+}
+
+.post-nav-dir {
+  display: block;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.post-nav-link:hover .post-nav-dir {
+  color: var(--accent);
+}
+
+.nav-label {
+  display: block;
+  font-weight: 600;
+  color: var(--text-primary);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.post-nav-link:hover .nav-label {
+  color: var(--accent);
+}
+
+/* ===== 相关推荐 ===== */
+.related-posts {
+  margin: 2.25rem 0 1.75rem;
+  padding: 1.15rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+}
+
+.related-title {
+  margin: 0 0 0.8rem;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--text-bright);
+}
+
+.related-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.related-link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0.3rem 0.75rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.related-link:hover {
+  background: var(--accent-glow);
+  border-color: var(--border-glow);
+  transform: translateX(2px);
+}
+
+/* 路径行 —— 相关推荐的终端文件路径 */
+.related-link-path {
+  grid-column: 1 / -1;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  color: var(--text-muted);
+}
+
+.related-link-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.92rem;
+}
+
+.related-link-arrow {
+  color: var(--accent);
+  font-weight: 700;
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+}

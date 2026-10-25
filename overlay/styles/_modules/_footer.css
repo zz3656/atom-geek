@@ -1,0 +1,110 @@
+/* Atom Blog — Footer（TUI 系统状态栏）
+ *
+ * 形态与 tmux / vim 的状态栏一致：左右两段 + 一行快捷键提示。
+ * 右侧块内部再分两行：链接行在上，构建信息（build / astro / static）在其正下方。
+ */
+
+.site-footer {
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  margin-top: auto;
+  position: relative;
+  transition: background 0.3s ease;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+
+.footer-content {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 1rem 1.75rem 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+/* ===== 状态栏 ===== */
+.footer-status {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.7rem 1rem;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+/* 右侧块：链接行 + 其正下方的构建信息（两行右对齐） */
+.footer-right-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.footer-left,
+.footer-mid {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  /* 允许在窄屏折行，避免状态栏内容溢出自己的盒子 */
+  flex-wrap: wrap;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.footer-copy {
+  color: var(--text-secondary);
+}
+
+/* TERMINAL SESSION —— 站点的终端身份标识，不随宽度折行 */
+.footer-tagline {
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+}
+
+.footer-author {
+  color: var(--accent);
+}
+
+.footer-build {
+  color: var(--text-secondary);
+}
+
+.footer-mid a {
+  color: var(--text-muted);
+}
+
+.footer-mid a:hover {
+  color: var(--accent);
+}
+
+.footer-right {
+  display: flex;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.footer-right a {
+  color: var(--text-muted);
+  /* 保证触控热区 ≥ 24px（WCAG 2.5.8） */
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0;
+  transition: color 0.18s ease;
+}
+
+.footer-right a:hover {
+  color: var(--accent);
+}
+
+/* ===== 快捷键提示 ===== */
+.footer-keys {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  padding-top: 0.6rem;
+  border-top: 1px dashed var(--border-light);
+}

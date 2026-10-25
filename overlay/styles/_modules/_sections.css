@@ -1,0 +1,63 @@
+/* Atom Blog — Section Headers
+ *
+ * 区块标题区 = 一条命令 + 中文小标题 + 右侧计数。
+ */
+
+.section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-top: 1.75rem;
+}
+
+.section-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+/* 命令回显：提示符由 CSS 生成，前缀带色 */
+.section-eyebrow {
+  display: flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  color: var(--text-bright);
+  overflow-wrap: anywhere;
+}
+
+.section-eyebrow::before {
+  content: '~/yinteba $';
+  color: var(--accent);
+  font-weight: 600;
+  margin-right: 0.55rem;
+  flex-shrink: 0;
+}
+
+.section-title {
+  font-family: var(--font-sans);
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-bright);
+  line-height: 1.2;
+}
+
+.section-count {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===== 页面内的强调数值 ===== */
+.accent {
+  color: var(--accent);
+  font-weight: 700;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}

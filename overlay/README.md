@@ -35,7 +35,7 @@ overlay/
 ├── components/     → src/components/       （9 个 Astro 组件）
 ├── layouts/        → src/layouts/          （2 个 Astro 布局）
 ├── pages/          → src/pages/            （10 个页面）
-├── styles/         → src/styles/           （global.css + _theme-geek.css + 3 个新模块）
+├── styles/         → src/styles/           （global.css + _theme-geek.css + 21 个 CSS 模块）
 └── scripts/        → src/scripts/          （app.js）
 ```
 
@@ -79,11 +79,40 @@ overlay/
 
 #### `styles/` → `src/styles/`
 
+> ⚠️ **这一节必须整表覆盖**。上游 v1.1.0 的 CSS 里**一个 TUI class 都没有**
+> （`.term-window` / `.footer-status` / `.footer-mid` / `.cmd-tree` … 全部缺失），
+> 只覆盖组件不覆盖样式 = TUI 组件配旧 CSS，版式会直接塌。
+
+**TUI 新增模块（上游没有，需要新建）**
+
 | 文件 | 动作 | 说明 |
 |---|---|---|
-| `_modules/_index.css` | **新增** | 首页终端面板样式（419 行） |
-| `_modules/_ls.css` | **新增** | `ls -la` 列表样式（174 行） |
-| `_modules/_terminal.css` | **新增** | 终端外壳 / 标题栏 / ASCII 装饰（280 行） |
+| `_modules/_terminal.css` | **新增** | TUI 原语：终端外壳 / 标题栏 / ASCII 装饰（280 行） |
+| `_modules/_ls.css` | **新增** | `ls -la` 文章列表样式（174 行） |
+| `_modules/_index.css` | **新增** | 索引面板样式（分类页 / 标签页，419 行） |
+
+**覆盖模块（上游有同名文件，但内容是旧设计，必须整份替换）**
+
+| 文件 | 动作 | 说明 |
+|---|---|---|
+| `_modules/_header.css` | **覆盖** | 终端窗口外壳形态的 Header（349 行） |
+| `_modules/_footer.css` | **覆盖** | TUI 系统状态栏页脚（110 行） |
+| `_modules/_hero.css` | **覆盖** | 首页终端启动序列（226 行） |
+| `_modules/_post.css` | **覆盖** | 文章页 `cat` 输出形态 + 行号槽（507 行） |
+| `_modules/_toc.css` | **覆盖** | 命令树目录（180 行） |
+| `_modules/_search.css` | **覆盖** | 终端 `grep` 搜索（145 行） |
+| `_modules/_about.css` | **覆盖** | `cat README.md` 形态的关于页（200 行） |
+| `_modules/_post-extras.css` | **覆盖** | 打赏码与上下篇导航（210 行） |
+| `_modules/_responsive.css` | **覆盖** | 全站响应式（含页脚窄屏规则，457 行） |
+| `_modules/_variables.css` | **覆盖** | 共享 CSS 变量（104 行） |
+| `_modules/_layout.css` | **覆盖** | 主布局（137 行） |
+| `_modules/_pages.css` | **覆盖** | 页面外壳（107 行） |
+| `_modules/_pagination.css` | **覆盖** | 分页（77 行） |
+| `_modules/_sections.css` | **覆盖** | 区块标题（63 行） |
+| `_modules/_tags.css` | **覆盖** | 标签与分类（67 行） |
+| `_modules/_background.css` | **覆盖** | 背景（33 行） |
+| `_modules/_buttons.css` | **覆盖** | 按钮（49 行） |
+| `_modules/_reset.css` | **覆盖** | CSS Reset（123 行） |
 | `global.css` | **覆盖** | 导入顺序需包含上面 3 个新模块 |
 | `_theme-geek.css` | **覆盖** | 主题作用域增补（直角化 / 等宽角色 / 焦点环 / 降级） |
 
@@ -93,6 +122,8 @@ overlay/
 > @import './_modules/_terminal.css';   /* 在 _ls.css 之后 */
 > @import './_modules/_index.css';      /* 在 _terminal.css 之后 */
 > ```
+>
+> 上游的 `_modules/_progress.css` 与 `_modules/_scrollbar.css` 未变，无需覆盖。
 
 #### `scripts/` → `src/scripts/`
 

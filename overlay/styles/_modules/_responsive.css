@@ -1,0 +1,457 @@
+/* Atom Blog — Responsive Styles
+ *
+ * 断点：
+ *   ≤1080px  导航文字收起，只留路径
+ *   ≤900px   标题栏统计信息精简
+ *   ≤768px   抽屉菜单 + 列表行重排
+ *   ≤600px   列表行再压缩
+ *   ≤480px   极窄屏
+ */
+
+/* ===== 1080px：导航让位给搜索 ===== */
+@media (max-width: 1080px) {
+  .term-bar-host {
+    display: none;
+  }
+}
+
+/* ===== 900px：标题栏统计精简 ===== */
+@media (max-width: 900px) {
+  .term-bar-stats .term-stat:nth-of-type(3),
+  .term-bar-stats .term-stat:nth-of-type(4) {
+    display: none;
+  }
+
+  .term-bar-stats .term-sep:nth-of-type(2),
+  .term-bar-stats .term-sep:nth-of-type(3) {
+    display: none;
+  }
+}
+
+/* ===== 900px：ls 行提前收敛为 3 列 =====
+ * 桌面态是 6 列 grid（序号/权限位/日期/大小/文件名/分类），
+ * 固有宽度在窄屏放不下 —— 这里提前砍掉权限位与大小两列，
+ * 只留 [序号] 日期 文件名，分类徽标换行到第二行。 */
+@media (max-width: 900px) {
+  .ls-list {
+    padding-left: 0.9rem;
+  }
+
+  .ls-entry {
+    grid-template-columns: 2.9rem 5rem minmax(0, 1fr);
+    column-gap: 0.7rem;
+    padding: 0.6rem 0.6rem 0.6rem 0;
+  }
+
+  .ls-mode,
+  .ls-size {
+    display: none;
+  }
+
+  .ls-index {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .ls-date {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .ls-name {
+    grid-column: 3;
+    grid-row: 1;
+    font-size: 0.98rem;
+    white-space: normal;
+  }
+
+  .ls-cat {
+    grid-column: 3;
+    grid-row: 2;
+    justify-self: start;
+  }
+
+  .ls-sub {
+    padding: 0 0.6rem 0.65rem 0;
+    gap: 0.5rem;
+  }
+
+  .ls-desc {
+    flex-basis: 100%;
+    font-size: 0.82rem;
+  }
+}
+
+/* ===== 768px：Mobile ===== */
+@media (max-width: 768px) {
+  /* --- 标题栏 --- */
+  .term-bar {
+    gap: 0.6rem;
+  }
+
+  .term-bar-stats {
+    font-size: 0.62rem;
+    gap: 0.35rem;
+  }
+
+  /* --- Hero --- */
+  .hero {
+    padding: 2.25rem 0 1.5rem;
+  }
+
+  .hero-desc {
+    font-size: 0.95rem;
+  }
+
+  /* --- 导航 --- */
+  .nav-container {
+    gap: 0.6rem;
+  }
+
+  .nav-toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 32px;
+    height: 32px;
+    padding: 6px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    gap: 4px;
+    transition:
+      border-color 0.25s ease,
+      background-color 0.25s ease;
+    flex-shrink: 0;
+  }
+
+  .nav-toggle:hover {
+    border-color: var(--accent);
+    background: var(--accent-glow);
+  }
+
+  .hamburger-line {
+    display: block;
+    width: 16px;
+    height: 2px;
+    background: var(--text-secondary);
+    border-radius: 1px;
+    transition:
+      transform 0.3s ease,
+      opacity 0.3s ease,
+      background-color 0.25s ease;
+  }
+
+  .nav-toggle[aria-expanded='true'] .hamburger-line:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+  }
+
+  .nav-toggle[aria-expanded='true'] .hamburger-line:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  .nav-toggle[aria-expanded='true'] .hamburger-line:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+
+  .nav-toggle[aria-expanded='true'] .hamburger-line {
+    background: var(--accent);
+  }
+
+  /* 抽屉菜单 */
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: var(--header-height);
+    left: 0;
+    right: 0;
+    background: var(--bg-primary);
+    flex-direction: column;
+    padding: 0.6rem 1rem 0.8rem;
+    gap: 0.1rem;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+    z-index: 99;
+    align-items: stretch;
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+
+  .nav-link {
+    padding: 0.5rem 0.7rem;
+    font-size: 0.85rem;
+  }
+
+  .nav-actions {
+    order: 2;
+    margin-left: auto;
+    flex: 1 1 auto;
+    min-width: 0;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 0.4rem;
+  }
+
+  .nav-toggle {
+    order: 3;
+    margin-left: 0.1rem;
+  }
+
+  /* 搜索框改为可伸缩：窄屏下不再用固定宽度，
+   * 聚焦时也不会突然变宽把顶栏撑破（iOS 聚焦还会自动放大页面）。 */
+  .search-wrapper {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .search-input {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+  }
+
+  .search-input:focus {
+    width: auto;
+  }
+
+  /* --- 页面标题区 --- */
+  .cmd-header,
+  .unified-page-header {
+    padding: 1.9rem 0 0.9rem;
+  }
+
+  /* --- 区块标题 --- */
+  .section-header {
+    padding-top: 1.25rem;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+  }
+
+  /* --- ls 行重排（≤900px 已收敛为 3 列，这里只做间距微调）--- */
+  .ls-list {
+    padding-left: 0.9rem;
+  }
+
+  /* --- 目录行重排 --- */
+  .dir-entry {
+    /* 日期列改成 max-content：日期是 nowrap 文本，
+     * 固定 4.8rem 会比内容窄几像素，导致内容溢出格子。 */
+    grid-template-columns: 5.4rem max-content minmax(0, 1fr);
+    column-gap: 0.7rem;
+    padding: 0.55rem 0.6rem 0.55rem 0;
+  }
+
+  .dir-links,
+  .dir-group {
+    display: none;
+  }
+
+  .dir-mode {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .dir-date {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .dir-name {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .dir-count {
+    grid-column: 3;
+    grid-row: 2;
+    justify-self: start;
+  }
+
+  /* --- grep 行 --- */
+  .grep-entry {
+    flex-wrap: wrap;
+    gap: 0.2rem 0.45rem;
+  }
+
+  .grep-meta {
+    padding-left: 0;
+  }
+
+  /* --- Main --- */
+  main {
+    padding: 0 1.1rem 2.25rem;
+  }
+
+  /* --- Post Nav --- */
+  .post-nav-links {
+    grid-template-columns: 1fr;
+  }
+
+  .reward-qr {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .reward-item img {
+    width: 160px;
+    height: 160px;
+  }
+
+  /* --- Footer --- */
+  .footer-status {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.55rem;
+  }
+
+  /* 窄屏整块左对齐，避免链接行被推到右边 */
+  .footer-right-col {
+    align-items: flex-start;
+  }
+
+  /* --- 正文行号槽收窄 --- */
+  .post-content {
+    --term-gutter: 2.6rem;
+    font-size: 0.95rem;
+  }
+
+  .post-content h2 {
+    font-size: 1.2rem;
+  }
+
+  .post-content h3 {
+    font-size: 1.04rem;
+  }
+
+  .post-content pre code {
+    font-size: 0.78rem;
+  }
+}
+
+/* ===== 480px：极窄屏 ===== */
+@media (max-width: 480px) {
+  /* --- About 主题面板：极窄屏收成单列 ---
+   * 两列布局在 320px 下每列只剩 ~61px，卡片里的标签 chip 会溢出卡片。 */
+  .about-topics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .hero {
+    padding: 1.75rem 0 1.25rem;
+  }
+
+  .hero-desc {
+    font-size: 0.9rem;
+  }
+
+  .cmd-header,
+  .unified-page-header {
+    padding: 1.5rem 0 0.75rem;
+  }
+
+  .cmd-count {
+    font-size: 0.7rem;
+  }
+
+  .section-header {
+    gap: 0.75rem;
+  }
+
+  .section-title {
+    font-size: 1.12rem;
+  }
+
+  .section-count {
+    font-size: 0.68rem;
+  }
+
+  .site-name-text {
+    font-size: 0.9rem;
+  }
+
+  .term-bar-stats {
+    display: none;
+  }
+
+  /* 搜索框宽度由 ≤768px 的可伸缩规则统一处理，这里不再覆盖 */
+  .theme-toggle .theme-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* --- 刊头 --- */
+  .post-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .post-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .post-description {
+    font-size: 0.9rem;
+  }
+
+  .post-command {
+    font-size: 0.78rem;
+  }
+
+  .post-filemeta {
+    font-size: 0.68rem;
+    gap: 0.25rem 0.85rem;
+  }
+
+  .hero-image img {
+    height: 200px;
+  }
+
+  .post-content {
+    --term-gutter: 2.2rem;
+    font-size: 0.93rem;
+  }
+
+  .search-results {
+    min-width: 240px;
+    max-width: calc(100vw - 2rem);
+    right: -0.5rem;
+  }
+
+  .post-nav-link {
+    font-size: 0.8rem;
+    padding: 0.65rem 0.8rem;
+  }
+
+  .related-posts {
+    padding: 0.95rem;
+  }
+
+  .post-reward {
+    padding: 1.15rem;
+  }
+
+  .reward-item img {
+    width: 140px;
+    height: 140px;
+  }
+
+  .pagination {
+    margin-top: 1.75rem;
+  }
+
+  .page-btn {
+    padding: 0.36rem 0.75rem;
+    font-size: 0.76rem;
+  }
+
+  .page-link {
+    min-width: 1.8rem;
+    height: 1.8rem;
+    font-size: 0.76rem;
+  }
+}

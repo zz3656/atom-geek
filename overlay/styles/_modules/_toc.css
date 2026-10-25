@@ -1,0 +1,180 @@
+/* Atom Blog — Table of Contents（TUI: 命令树）
+ *
+ * 结构：$ tree posts/<slug>
+ * 每个条目是一根树枝：├─ / └─（子层级带 │ 引导线）。
+ *
+ * 布局策略（响应式两档）:
+ *   - 桌面端 (>=1280px): TOC 悬浮在文章左侧空白区，**不挤压正文**
+ *   - 窄屏端 (<1280px): TOC 顶部水平折叠菜单，正文保持满宽居中
+ *
+ * 铁律：TOC 永远不能挤压正文宽度。
+ *   正文列固定 --content-width(740px) 居中，TOC 只能待在两侧空白区。
+ */
+
+.post-content-wrapper {
+  display: block;
+  position: relative;
+}
+
+/* ===== TOC 基础样式（窄屏端：顶部折叠面板）===== */
+.toc {
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 0.7rem 0.9rem;
+}
+
+/* 桌面端：悬浮在文章左侧空白区，垂直居中 */
+@media (min-width: 1280px) {
+  .toc {
+    position: fixed;
+    top: 50%;
+    left: calc(50% - 588px);
+    transform: translateY(-50%);
+    width: 200px;
+    max-height: calc(100vh - var(--header-height) - 3rem);
+    overflow-y: auto;
+    /* 侧栏固定宽 200px，内部内容偶尔多出几像素；
+     * 这里显式关掉横向滚动，避免目录区出现可以左右滑动的区域。
+     * （此处不能用 clip：overflow-y 是 auto，clip 会被规范降级成 hidden。） */
+    overflow-x: hidden;
+    z-index: 10;
+    background: none;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+  }
+}
+
+/* 窄屏端：回归文档流（顶部折叠条） */
+@media (max-width: 1279px) {
+  .toc {
+    position: static;
+    max-height: none;
+    overflow-y: visible;
+    width: fit-content;
+    min-width: 13rem;
+    max-width: 100%;
+    padding: 0.45rem 0.8rem;
+  }
+}
+
+/* ===== details/summary 样式 ===== */
+.toc-title {
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: var(--text-secondary);
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  /* 保证触控热区 ≥ 24px（WCAG 2.5.8） */
+  padding: 0.35rem 0;
+  min-height: 26px;
+  /* 折叠箭头是 flex-shrink:0 的伪元素，窄屏下会顶出 summary；
+   * 这里裁掉多余宽度，内容改由 .toc-cmd 的省略号承载。 */
+  overflow: hidden;
+}
+
+.toc-prompt {
+  color: var(--accent);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.toc-cmd {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 折叠箭头 */
+.toc-title::after {
+  content: '▾';
+  margin-left: auto;
+  font-size: 0.65rem;
+  color: var(--accent);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.toc details:not([open]) .toc-title::after {
+  transform: rotate(-90deg);
+}
+
+.toc-title::-webkit-details-marker {
+  display: none;
+}
+
+/* ===== 命令树 ===== */
+.toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.6rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.08rem;
+}
+
+.toc-item {
+  margin: 0;
+}
+
+.toc-link {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: 0.22rem 0.4rem;
+  border-left: 2px solid transparent;
+  transition:
+    color 0.18s ease,
+    background-color 0.18s ease,
+    border-color 0.18s ease;
+  line-height: 1.55;
+}
+
+.toc-branch {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  white-space: pre;
+}
+
+.toc-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.toc-link:hover {
+  color: var(--accent);
+  background: var(--accent-glow);
+}
+
+.toc-link.active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  background: var(--accent-glow);
+  font-weight: 600;
+}
+
+/* 子层级：留出引导线宽度 */
+.toc-depth-3 .toc-link {
+  padding-left: 0.4rem;
+  font-size: 0.73rem;
+}
+
+@media (max-width: 768px) {
+  .toc-link {
+    font-size: 0.74rem;
+  }
+}

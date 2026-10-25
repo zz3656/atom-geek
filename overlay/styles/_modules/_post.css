@@ -1,0 +1,507 @@
+/* Atom Blog — Blog Post Content（TUI: cat 输出）
+ *
+ * 刊头   = ~/yinteba $ cat posts/<slug>.md + 文件元信息
+ * 正文   = cat 的输出，左侧一行号槽（纯 CSS counter，零 JS）
+ * 引用   = 终端回显（绿色竖条 + > 前缀）
+ * 代码块 = 带标题栏的终端窗口（标题取 Shiki 的 data-language）
+ */
+
+/* ===== 容器 ===== */
+.post {
+  max-width: var(--content-width);
+  margin: 0 auto;
+}
+
+/* ===== 刊头 ===== */
+.post-header {
+  margin-bottom: 2rem;
+}
+
+.post-command {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
+  line-height: 1.6;
+  margin-bottom: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.post-prompt {
+  color: var(--accent);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.post-cmd {
+  color: var(--text-bright);
+}
+
+.post-header h1 {
+  font-family: var(--font-sans);
+  font-size: clamp(1.75rem, 4.4vw, 2.55rem);
+  font-weight: 800;
+  letter-spacing: -0.028em;
+  line-height: 1.22;
+  color: var(--text-bright);
+  margin-bottom: 0.85rem;
+}
+
+.post-description {
+  font-size: 0.98rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin-bottom: 1rem;
+}
+
+.post-meta {
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}
+
+.updated {
+  color: var(--warning);
+}
+
+/* ===== 文件元信息 ===== */
+.post-filemeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1.15rem;
+  list-style: none;
+  padding: 0.55rem 0;
+  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+
+.post-filemeta li {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.fm-key {
+  color: var(--text-muted);
+}
+
+.fm-key::after {
+  content: ':';
+}
+
+.fm-val {
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.fm-val--cat {
+  color: var(--cat-text);
+}
+
+.fm-val--warn {
+  color: var(--warning);
+}
+
+.post-meta-extra {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.8rem;
+}
+
+.hero-image {
+  margin-bottom: 2rem;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.hero-image img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  display: block;
+}
+
+/* ===== 正文（cat 输出 + 行号槽）===== */
+.post-content {
+  line-height: 1.85;
+  font-size: 1rem;
+  color: var(--text-primary);
+  counter-reset: ln;
+  position: relative;
+  padding-left: var(--term-gutter);
+}
+
+/* 行号槽里的竖线 */
+.post-content::before {
+  content: '';
+  position: absolute;
+  left: calc(var(--term-gutter) - 0.95rem);
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--border-light);
+}
+
+/* 每个块级元素占一行号（li 不单独编号） */
+.post-content > * {
+  counter-increment: ln;
+  position: relative;
+}
+
+.post-content > *::before {
+  content: counter(ln, decimal-leading-zero);
+  position: absolute;
+  left: calc(-1 * var(--term-gutter));
+  width: calc(var(--term-gutter) - 1.35rem);
+  text-align: right;
+  top: 0.22em;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.post-content p {
+  margin-bottom: 1.15rem;
+}
+
+.post-content h2 {
+  font-family: var(--font-sans);
+  font-size: 1.38rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 2.5rem 0 0.95rem;
+  color: var(--text-bright);
+  line-height: 1.35;
+  border-left: 2px solid var(--accent);
+  padding-left: 0.7rem;
+}
+
+.post-content h3 {
+  font-family: var(--font-sans);
+  font-size: 1.14rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  margin: 1.9rem 0 0.75rem;
+  color: var(--text-bright);
+}
+
+.post-content h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 1.5rem 0 0.6rem;
+  color: var(--text-bright);
+}
+
+.post-content ul,
+.post-content ol {
+  margin-bottom: 1.15rem;
+  padding-left: 1.4rem;
+}
+
+.post-content ul li::marker {
+  color: var(--accent);
+  font-family: var(--font-mono);
+}
+
+.post-content ol li::marker {
+  color: var(--accent);
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.post-content li {
+  margin-bottom: 0.4rem;
+}
+
+/* 引用块 —— 终端回显：绿色竖条 + > 前缀 */
+.post-content blockquote {
+  border-left: 2px solid var(--accent);
+  padding: 0.55rem 0 0.55rem 0.95rem;
+  margin: 1.6rem 0;
+  background: var(--accent-glow);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  color: var(--text-secondary);
+}
+
+.post-content blockquote p {
+  margin-bottom: 0;
+}
+
+.post-content blockquote p::before {
+  content: '> ';
+  font-family: var(--font-mono);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.post-content code {
+  background: var(--bg-inline-code);
+  padding: 0.1rem 0.32rem;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.87em;
+  color: var(--accent);
+  border: 1px solid var(--border-light);
+}
+
+/* ===== 代码块：带标题栏的终端窗口 ===== */
+.post-content pre {
+  position: relative;
+  margin: 1.5rem 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--code-bg);
+  border: 1px solid var(--border-color);
+}
+
+/* 标题栏 —— 文件名（app.js 依据真实 slug / 块序号写入 data-file） */
+.post-content pre::before {
+  content: attr(data-file);
+  display: block;
+  padding: 0.32rem 8.8rem 0.32rem 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 标题栏右侧：语言名（Shiki 输出的 data-language） */
+.post-content pre::after {
+  content: attr(data-language);
+  position: absolute;
+  top: 0.34rem;
+  right: 5.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cat-text);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.post-content pre code {
+  background: none;
+  padding: 0.95rem 1rem;
+  display: block;
+  overflow-x: auto;
+  font-size: 0.82rem;
+  line-height: 1.65;
+  color: var(--text-primary);
+  border: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.post-content img {
+  border-radius: var(--radius);
+  margin: 1.5rem 0;
+  border: 1px solid var(--border-color);
+}
+
+.post-content a {
+  text-decoration: underline;
+  text-decoration-color: var(--border-glow);
+  text-underline-offset: 3px;
+  font-weight: 500;
+}
+
+.post-content a:hover {
+  text-decoration-color: var(--accent);
+}
+
+/* 分隔线 —— 一行短横线 */
+.post-content hr {
+  border: none;
+  height: 1px;
+  background: var(--border-color);
+  margin: 2.5rem 0;
+}
+
+/* ===== 表格 ===== */
+.post-content .table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  -webkit-overflow-scrolling: touch;
+}
+
+.post-content table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.post-content .table-scroll table {
+  margin: 0;
+  border: none;
+  border-radius: 0;
+}
+
+.post-content th,
+.post-content td {
+  border: 1px solid var(--border-color);
+  padding: 0.55rem 0.9rem;
+  text-align: left;
+}
+
+.post-content th {
+  white-space: nowrap;
+  background: var(--bg-secondary);
+  font-weight: 700;
+  color: var(--text-bright);
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ===== 代码复制按钮 ===== */
+.code-wrapper {
+  position: relative;
+}
+
+.code-copy-btn {
+  position: absolute;
+  top: 0.26rem;
+  right: 0.42rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  padding: 0.24rem 0.48rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+  z-index: 5;
+}
+
+.code-wrapper:hover .code-copy-btn,
+.code-copy-btn:focus-visible {
+  opacity: 1;
+}
+
+.code-copy-btn:hover {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+
+.code-copy-btn.copied {
+  background: var(--success);
+  color: var(--bg-primary);
+  border-color: var(--success);
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .code-copy-btn {
+    opacity: 1;
+  }
+}
+
+/* ===== 图片灯箱 ===== */
+.image-zoom-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  cursor: zoom-out;
+  animation: fadeIn 0.2s ease;
+}
+
+.image-zoom-overlay .image-zoom-img {
+  max-width: 95vw;
+  max-height: 95vh;
+  object-fit: contain;
+  border-radius: var(--radius);
+  cursor: default;
+}
+
+.image-zoom-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 1.75rem;
+  line-height: 1;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.image-zoom-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ===== Shiki 双主题切换 =====
+ * Astro/Shiki 输出的代码块结构:
+ *   <pre class="astro-code github-light github-dark" data-language="js">
+ *     <span style="color:#xxx;--shiki-dark:#yyy">token</span>
+ *   </pre>
+ *
+ * light 模式：使用内联 color
+ * dark  模式：用 --shiki-dark 覆盖 color，并使用 --shiki-dark-bg 作为背景
+ */
+html[data-mode='dark'] .post-content pre.astro-code {
+  background-color: var(--shiki-dark-bg, #0d1117) !important;
+}
+
+html[data-mode='dark'] .post-content pre.astro-code span {
+  color: var(--shiki-dark) !important;
+}
+
+/* 属性选择器保险：class 顺序可能变化 */
+html[data-mode='dark'] .post-content pre[class*='github-dark'] span[style*='--shiki-dark'] {
+  color: var(--shiki-dark) !important;
+}
