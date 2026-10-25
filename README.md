@@ -2,9 +2,11 @@
 
 ![Atom Geek —— TUI 终端形态主题包：终端窗口外壳、磷光绿 `>_` 标记、Atom Geek 字标](preview/banner.png)
 
+🌐 **在线演示**：<https://www.inte8.top/>　·　GitHub Pages 镜像：<https://zz3656.github.io/Atom-blog/>
+
 > Atom 博客的**第三方主题**。把站点变成一台终端机：磷光绿/磷光纸双模配色，外加一套完整的 TUI 组件层覆盖包。
 >
-> 来源：[因特吧](https://zz3656.github.io/Atom-blog/)（zz3656 的 Atom 博客实例）· MIT License · 作者 zz3656
+> 来源：[因特吧](https://www.inte8.top/)（zz3656 的 Atom 博客实例）· MIT License · 作者 zz3656
 
 ---
 
@@ -211,7 +213,7 @@ JetBrains Mono 只用于**真实的数据与机器输出**：日期、计数、�
 
 ## 来源与许可
 
-主题取自 [因特吧](https://zz3656.github.io/Atom-blog/)（`zz3656/Atom-blog` 的 TUI 形态实例），由 zz3656 原创。
+主题取自 [因特吧](https://www.inte8.top/)（`zz3656/Atom-blog` 的 TUI 形态实例，GitHub Pages 镜像 <https://zz3656.github.io/Atom-blog/>），由 zz3656 原创。
 
 - 代码与主题：MIT License，见 [LICENSE](./LICENSE)
 - 完整 token 契约与架构说明：[`docs/ARCHITECTURE-ATOM-GEEK.md`](./docs/ARCHITECTURE-ATOM-GEEK.md)
