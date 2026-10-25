@@ -1,0 +1,161 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION, AUTHOR, SITE_FAVICON, DEFAULT_THEME_ID } from '../consts';
+import { rssUrl, baseAssetsPath } from '../utils/path';
+import { themes } from '../generated/themes';
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  /** 覆盖 og:url/canonical (默认用当前页面 URL，404 页可覆盖为主页) */
+  pageUrl?: string;
+}
+
+const { title, description, image, type = 'website', pageUrl } = Astro.props;
+const canonicalUrl = pageUrl || String(Astro.url);
+const fullTitle = title;
+const desc = description || SITE_DESCRIPTION;
+const rssLink = rssUrl();
+const faviconLink = baseAssetsPath(SITE_FAVICON);
+const searchBase = baseAssetsPath('/');
+
+// Site URL for OG/Twitter images and RSS
+const siteUrl = String(Astro.site || '').replace(/\/$/, '');
+const ogImage = image ? `${siteUrl}${image}` : `${siteUrl}/favicon.svg`;
+
+// 主题清单（构建时由 theme-loader 自动生成，仅包含有效主题 ID）
+// 用于内联脚本的运行时校验，防止老用户 localStorage 中的过期主题 ID 被吞
+const themeIds = themes.map((t) => t.id);
+// 默认主题：优先站点配置 DEFAULT_THEME_ID；
+// 该主题包缺失 / 未注册时回退到清单首个可用主题，保证站点始终可用。
+const defaultThemeId = themeIds.includes(DEFAULT_THEME_ID)
+  ? DEFAULT_THEME_ID
+  : themeIds[0] || DEFAULT_THEME_ID;
+---
+
+<!doctype html>
+<html lang="zh-CN" data-theme={defaultThemeId} data-mode="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- CSP & Security -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="description" content={desc} />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="author" content={AUTHOR} />
+    <meta name="theme-color" content="#f2f6f3" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#05070a" media="(prefers-color-scheme: dark)" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:site_name" content={SITE_TITLE} />
+
+    <!-- canonical URL: 避免 /blog/foo 与 /blog/foo/ 被重复索引 -->
+    <link rel="canonical" href={canonicalUrl} />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={desc} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- RSS FEED -->
+    <link rel="alternate" type="application/rss+xml" title={SITE_TITLE} href={rssLink} />
+
+    <!-- OpenSearch -->
+    <link
+      rel="search"
+      type="application/opensearchdescription+xml"
+      href={baseAssetsPath('/opensearch.xml')}
+      title={SITE_TITLE}
+    />
+
+    <link rel="icon" type="image/svg+xml" href={faviconLink} />
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href={baseAssetsPath('/manifest.json')} />
+
+    <!-- Font preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!--
+      Archivo：可变字体（含 wdth 宽度轴），标题用宽字重变化制造标识感
+      JetBrains Mono：等宽字体，只承担「数据」与代码
+    -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+      crossorigin="anonymous"
+    />
+    <title>{fullTitle}</title>
+    <script is:inline define:vars={{ defaultThemeId, themeIds }}>
+      // Apply theme synchronously before page render to avoid FOUC
+      // 多主题系统: localStorage.themeId (主题 ID) + localStorage.themeMode ('light'|'dark')
+      // VALID_IDS 与 DEFAULT_ID 由构建时注入（来自 src/generated/themes.ts），
+      // 新增/删除主题后会自动同步，无需手动维护硬编码列表。
+      (function () {
+        var html = document.documentElement;
+        var id = localStorage.getItem('themeId');
+        var mode = localStorage.getItem('themeMode');
+        if (!id || themeIds.indexOf(id) === -1) id = defaultThemeId;
+        if (mode !== 'light' && mode !== 'dark') {
+          mode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        html.setAttribute('data-theme', id);
+        html.setAttribute('data-mode', mode);
+      })();
+    </script>
+    <slot name="head" />
+    <noscript>
+      <style>
+        /* JS disabled 时：默认浅色 + 调整布局避免主题按钮占位 */
+        html {
+          color-scheme: light;
+        }
+        .theme-toggle {
+          display: none;
+        }
+      </style>
+      <div style="background:#fef3c7;color:#92400e;padding:0.75rem 1rem;text-align:center;font-size:0.9rem;border-bottom:1px solid #f59e0b;">
+        本站某些功能（主题切换 / 搜索 / 代码复制）需要 JavaScript。基础阅读不受影响。
+      </div>
+    </noscript>
+  </head>
+  <body data-search-base={searchBase}>
+    <a class="skip-link" href="#main-content">
+      跳到主要内容
+    </a>
+    <div class="term-window">
+      <Header />
+      <main id="main-content" tabindex="-1">
+        <slot />
+      </main>
+      <Footer />
+    </div>
+    <button id="back-to-top" class="back-to-top" aria-label="返回顶部" type="button">
+      <svg
+        viewBox="0 0 24 24"
+        width="18"
+        height="18"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <polyline points="18 15 12 9 6 15"></polyline>
+      </svg>
+    </button>
+    <script src={baseAssetsPath('/js/app.js')} defer></script>
+  </body>
+</html>

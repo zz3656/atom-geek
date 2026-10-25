@@ -1,0 +1,60 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import GrepHit from '../../components/GrepHit.astro';
+import CommandHeader from '../../components/CommandHeader.astro';
+import { SITE_TITLE } from '../../consts';
+import { getPublishedPosts } from '../../utils/collection';
+import { blogPostUrl, tagsUrl } from '../../utils/path';
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  const allTags = new Set<string>();
+  posts.forEach((post) => (post.data.tags || []).forEach((tag) => allTags.add(tag)));
+
+  return [...allTags].map((tag) => ({
+    params: { tag },
+  }));
+}
+
+const { tag } = Astro.params;
+
+const tagPosts = (await getPublishedPosts()).filter((post) => post.data.tags?.includes(tag));
+---
+
+<BaseLayout title={`${tag} | ${SITE_TITLE}`}>
+  <section class="listing-page">
+    <CommandHeader
+      cmd={`grep -rn "${tag}" ~/posts`}
+      title={tag}
+      count={`${tagPosts.length} hits · 共 ${tagPosts.length} 篇文章`}
+    />
+
+    {
+      tagPosts.length > 0 ? (
+        <ul class="grep-list">
+          {tagPosts.map((post) => (
+            <GrepHit
+              url={blogPostUrl(post.id)}
+              file={post.id}
+              title={post.data.title}
+              body={post.body}
+              tag={tag}
+              pubDate={post.data.pubDate}
+            />
+          ))}
+        </ul>
+      ) : (
+        <div class="empty-list">
+          <div class="empty-list-icon" aria-hidden="true">
+            ⊘
+          </div>
+          <p class="empty-list-text">该标签下暂无文章</p>
+        </div>
+      )
+    }
+
+    <div class="view-all">
+      <a href={tagsUrl()}>← $ cd ~/tags</a>
+    </div>
+  </section>
+</BaseLayout>

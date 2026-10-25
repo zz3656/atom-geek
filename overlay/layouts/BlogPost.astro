@@ -1,0 +1,240 @@
+---
+// Atom Blog — 文章页（TUI: cat 输出）
+//
+// 刊头 = 命令回显：~/yinteba $ cat posts/<slug>.md
+// 刊头下方 = 文件元信息（大小 / 行数 / 日期 / 分类 / 阅读时长）
+// 正文   = cat 的输出，左侧带行号槽（纯装饰，app.js 渲染）
+import BaseLayout from './BaseLayout.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import { AUTHOR, SITE_TITLE } from '../consts';
+import { blogPostUrl, rootPath, baseAssetsPath } from '../utils/path';
+import { readingTime, countWords } from '../utils/blog';
+import { formatDateISO } from '../utils/date';
+
+interface Props {
+  title: string;
+  slug?: string;
+  pubDate: Date;
+  updatedDate?: Date;
+  description: string;
+  heroImage?: string;
+  featuredImage?: string;
+  category?: string;
+  tags?: string[];
+  reward?: boolean;
+  body?: string;
+  prevPost?: { title: string; slug: string };
+  nextPost?: { title: string; slug: string };
+  relatedPosts?: { title: string; slug: string }[];
+  toc?: { depth: number; slug: string; text: string }[];
+}
+
+const {
+  title,
+  slug = '',
+  pubDate,
+  updatedDate,
+  description,
+  heroImage,
+  featuredImage,
+  category = '',
+  tags = [],
+  reward = false,
+  body = '',
+  prevPost,
+  nextPost,
+  relatedPosts = [],
+  toc = [],
+} = Astro.props;
+const readingMinutes = readingTime(body || '');
+// 文件元信息（真实数据）：字节数与行数都取自 Markdown 原文
+const fileSize = `${(new TextEncoder().encode(body || '').length / 1024).toFixed(1)}K`;
+const fileLines = body ? body.split('\n').length : 0;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  image={featuredImage || heroImage || undefined}
+  type="article"
+>
+  <fragment slot="head">
+    {(() => {
+      const imageUrl =
+        featuredImage || heroImage ? `${Astro.url.origin}${featuredImage || heroImage}` : undefined;
+      const publisherLogo = `${Astro.url.origin}/favicon.svg`;
+      const wordCount = countWords(body || '');
+      return (
+        <script
+          type="application/ld+json"
+          set:html={JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'BlogPosting',
+            headline: title,
+            name: title,
+            description: description || '',
+            datePublished: pubDate.toISOString(),
+            dateModified: updatedDate ? updatedDate.toISOString() : pubDate.toISOString(),
+            image: imageUrl,
+            wordCount: wordCount,
+            timeRequired: `PT${readingMinutes}M`,
+            keywords: tags.join(', '),
+            articleSection: category || undefined,
+            author: { '@type': 'Person', name: AUTHOR },
+            publisher: {
+              '@type': 'Organization',
+              name: SITE_TITLE,
+              logo: { '@type': 'ImageObject', url: publisherLogo },
+            },
+            mainEntityOfPage: { '@type': 'WebPage', '@id': Astro.url },
+          })}
+        ></script>
+      );
+    })()}
+  </fragment>
+  <div class="reading-progress-container">
+    <div class="reading-progress">
+      <div class="reading-progress-fill"></div>
+    </div>
+  </div>
+  <article class="post" data-post-slug={slug}>
+    <header class="post-header">
+      <p class="post-command">
+        <span class="post-prompt" aria-hidden="true">~/yinteba $</span>
+        <span class="post-cmd">cat posts/{slug}.md</span>
+      </p>
+      <h1>{title}</h1>
+      <p class="post-description">{description}</p>
+
+      <ul class="post-filemeta">
+        <li>
+          <span class="fm-key">size</span>
+          <span class="fm-val">{fileSize}</span>
+        </li>
+        <li>
+          <span class="fm-key">lines</span>
+          <span class="fm-val">{fileLines}</span>
+        </li>
+        <li>
+          <span class="fm-key">date</span>
+          <span class="fm-val">
+            <time datetime={pubDate.toISOString()}>{formatDateISO(pubDate)}</time>
+          </span>
+        </li>
+        {category && (
+          <li>
+            <span class="fm-key">cat</span>
+            <span class="fm-val fm-val--cat">{category}</span>
+          </li>
+        )}
+        <li>
+          <span class="fm-key">read</span>
+          <span class="fm-val">{readingMinutes} min</span>
+        </li>
+        {updatedDate && (
+          <li>
+            <span class="fm-key">upd</span>
+            <span class="fm-val fm-val--warn">updated {formatDateISO(updatedDate)}</span>
+          </li>
+        )}
+      </ul>
+
+      {tags.length > 0 && (
+        <div class="post-meta-extra">
+          <span class="post-tags-row">
+            {tags.map((tag) => (
+              <span class="tag">#{tag}</span>
+            ))}
+          </span>
+        </div>
+      )}
+    </header>
+
+    {heroImage && (
+      <div class="hero-image">
+        <img
+          src={heroImage}
+          alt={title}
+          loading="eager"
+          fetchpriority="high"
+          width="1200"
+          height="630"
+        />
+      </div>
+    )}
+
+    <div class="post-content-wrapper">
+      <TableOfContents headings={toc} postSlug={slug} />
+      {/* 行号槽由 CSS counter 渲染（.post-content > *），零 JS */}
+      <div class="post-content">
+        <slot />
+      </div>
+    </div>
+
+    {reward && (
+      <div class="post-reward">
+        <p class="reward-title">🤖 觉得文章有帮助？给因特吧加个油</p>
+        <div class="reward-qr">
+          <div class="reward-item">
+            <img
+              src={baseAssetsPath('/medias/reward/wechat.png')}
+              alt="微信赞赏码"
+              width="140"
+              height="140"
+            />
+            <span>微信赞赏</span>
+          </div>
+          <div class="reward-item">
+            <img
+              src={baseAssetsPath('/medias/reward/alipay.png')}
+              alt="支付宝收款码"
+              width="140"
+              height="140"
+            />
+            <span>支付宝赞赏</span>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {relatedPosts.length > 0 && (
+      <section class="related-posts">
+        <h3 class="related-title">📚 相关推荐</h3>
+        <ul class="related-list">
+          {relatedPosts.map((p) => (
+            <li>
+              <a href={blogPostUrl(p.slug)} class="related-link">
+                <span class="related-link-path" aria-hidden="true">/posts/{p.slug}.md</span>
+                <span class="related-link-title">{p.title}</span>
+                <span class="related-link-arrow" aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    {prevPost || nextPost ? (
+      <nav class="post-nav">
+        <div class="post-nav-links">
+          {prevPost && (
+            <a href={blogPostUrl(prevPost.slug)} class="post-nav-link prev">
+              <span class="nav-label">{prevPost.title}</span>
+              <span class="post-nav-dir" aria-hidden="true">← prev</span>
+            </a>
+          )}
+          {nextPost && (
+            <a href={blogPostUrl(nextPost.slug)} class="post-nav-link next">
+              <span class="nav-label">{nextPost.title}</span>
+              <span class="post-nav-dir" aria-hidden="true">next →</span>
+            </a>
+          )}
+        </div>
+      </nav>
+    ) : (
+      <div class="post-nav">
+        <a href={rootPath()}>← cd ~ 返回首页</a>
+      </div>
+    )}
+  </article>
+</BaseLayout>

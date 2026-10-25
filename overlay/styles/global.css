@@ -1,0 +1,105 @@
+/* Atom Blog — Global Styles */
+/* 主入口文件，按依赖顺序引入各模块 */
+/*
+ * 模块组织:
+ *  1. _variables   → 共享 CSS 变量（间距/字体/圆角/布局）
+ *  2. themes       → 所有已注册主题（运行时按 data-theme 切换）
+ *  3. _reset       → 浏览器默认样式重置
+ *  4. _background  → 页面背景纹理
+ *  5. _scrollbar   → 自定义滚动条
+ *  6. _header      → 终端标题栏 + 命令行导航
+ *  7. _search      → grep 搜索框与结果面板
+ *  8. _hero        → 终端启动 Hero（字标 / 自检 / 提示符）
+ *  9. _buttons     → 命令式按钮
+ * 10. _sections    → 区块标题
+ * 11. _ls          → 文章列表（ls -la 输出行）
+ * 12. _terminal    → TUI 原语（命令页头 / 目录行 / grep 命中 / 404）
+ * 13. _index       → 索引面板（词频面板 / 目录树面板）
+ * 14. _tags        → 标签 & 分类
+ * 15. _pages       → 页面壳（About 页头 / 空态 / 返回）
+ * 16. _post        → 文章正文（cat 输出 + 行号槽）
+ * 17. _post-extras → 打赏/上一篇下一篇/相关推荐
+ * 18. _toc         → 文章目录（命令树）
+ * 19. _pagination  → 分页
+ * 20. _progress    → 阅读进度条
+ * 21. _about       → 关于页（冻结文件）
+ * 22. _footer      → 系统状态栏
+ * 23. _layout      → 全局布局 & 动画
+ * 24. _responsive  → 响应式断点
+ * 25. _theme-geek  → 主题作用域增补（atom-geek，可整份删除）
+ */
+
+/* 1. Shared variables (layout, typography, radius — 跨主题共享) */
+@import './_modules/_variables.css';
+
+/* 2. Themes (所有主题通过自动生成的汇总入口加载 — 新增主题无需改本文件) */
+@import '../generated/themes.css';
+
+/* 3. Reset */
+@import './_modules/_reset.css';
+
+/* 4. Background */
+@import './_modules/_background.css';
+
+/* 5. Scrollbar */
+@import './_modules/_scrollbar.css';
+
+/* 6. Header & Navigation */
+@import './_modules/_header.css';
+
+/* 7. Search */
+@import './_modules/_search.css';
+
+/* 8. Hero Section */
+@import './_modules/_hero.css';
+
+/* 9. Buttons */
+@import './_modules/_buttons.css';
+
+/* 10. Section Headers */
+@import './_modules/_sections.css';
+
+/* 11. Article List (ls -la 输出行) */
+@import './_modules/_ls.css';
+
+/* 12. Terminal Primitives */
+@import './_modules/_terminal.css';
+
+/* 13. Index Panels (词频面板 / 目录树面板) */
+@import './_modules/_index.css';
+
+/* 14. Tags */
+@import './_modules/_tags.css';
+
+/* 15. Page Shells */
+@import './_modules/_pages.css';
+
+/* 16. Post Content (cat 输出 + 行号槽) */
+@import './_modules/_post.css';
+
+/* 17. Post Extras (Reward, Navigation) */
+@import './_modules/_post-extras.css';
+
+/* 18. Table of Contents (命令树) */
+@import './_modules/_toc.css';
+
+/* 19. Pagination */
+@import './_modules/_pagination.css';
+
+/* 20. Reading Progress */
+@import './_modules/_progress.css';
+
+/* 21. About Page（cat README.md 形态）*/
+@import './_modules/_about.css';
+
+/* 22. Footer */
+@import './_modules/_footer.css';
+
+/* 23. Layout & Animations */
+@import './_modules/_layout.css';
+
+/* 24. Responsive */
+@import './_modules/_responsive.css';
+
+/* 25. Theme-scoped augmentations（站点级；作用域锁定单个主题，可整份删除） */
+@import './_theme-geek.css';

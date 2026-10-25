@@ -1,0 +1,52 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+import { render } from 'astro:content';
+import { getPublishedPosts } from '../../utils/collection';
+import { getRelatedPosts } from '../../utils/blog';
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+
+  return posts.map((post, index) => ({
+    params: { slug: post.id },
+    props: {
+      post,
+      prevPost:
+        index < posts.length - 1
+          ? { title: posts[index + 1].data.title, slug: posts[index + 1].id }
+          : undefined,
+      nextPost:
+        index > 0 ? { title: posts[index - 1].data.title, slug: posts[index - 1].id } : undefined,
+      relatedPosts: getRelatedPosts(post, posts, 3).map((p) => ({
+        title: p.data.title,
+        slug: p.id,
+      })),
+    },
+  }));
+}
+
+const { post, prevPost, nextPost, relatedPosts } = Astro.props;
+const { Content, headings } = await render(post);
+// 仅显示 h2 + h3，避免过深
+const tocItems = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
+---
+
+<BlogPost
+  title={post.data.title}
+  slug={post.id}
+  pubDate={post.data.pubDate}
+  updatedDate={post.data.updatedDate}
+  description={post.data.description}
+  heroImage={post.data.heroImage}
+  featuredImage={post.data.featuredImage}
+  category={post.data.category}
+  tags={post.data.tags}
+  reward={post.data.reward}
+  body={post.body}
+  prevPost={prevPost}
+  nextPost={nextPost}
+  relatedPosts={relatedPosts}
+  toc={tocItems}
+>
+  <Content />
+</BlogPost>
