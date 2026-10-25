@@ -1,5 +1,7 @@
 # Atom Geek —— TUI 终端形态主题包
 
+![Atom Geek —— TUI 终端形态主题包：终端窗口外壳、磷光绿 `>_` 标记、Atom Geek 字标](preview/banner.png)
+
 > Atom 博客的**第三方主题**。把站点变成一台终端机：磷光绿/磷光纸双模配色，外加一套完整的 TUI 组件层覆盖包。
 >
 > 来源：[因特吧](https://zz3656.github.io/Atom-blog/)（zz3656 的 Atom 博客实例）· MIT License · 作者 zz3656
